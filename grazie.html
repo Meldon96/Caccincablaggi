@@ -1,0 +1,136 @@
+
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grazie! | Caccin Cablaggi</title>
+    <link rel="icon" href="LOGO.jpg">
+    <!-- Meta di reindirizzamento di sicurezza automatico a index.html dopo 5 secondi -->
+    <meta http-equiv="refresh" content="5;url=index.html">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #222;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            padding: 20px;
+        }
+        .thankyou-card {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            max-width: 600px;
+            width: 100%;
+            border-top: 6px solid #006666;
+        }
+        .icon-box {
+            font-size: 60px;
+            color: #ff6b35;
+            margin-bottom: 20px;
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        h1 {
+            color: #006666;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+        p {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 30px;
+        }
+        .countdown-container {
+            margin-top: 20px;
+        }
+        .progress-bar-bg {
+            width: 100%;
+            height: 6px;
+            background: #e0e6ed;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #006666, #ff6b35);
+            width: 100%;
+            animation: shrink 5s linear forwards;
+        }
+        .text-redirect {
+            font-size: 14px;
+            color: #888;
+            font-style: italic;
+        }
+        .btn-home {
+            display: inline-block;
+            background: #006666;
+            color: white;
+            text-decoration: none;
+            padding: 12px 25px;
+            border-radius: 6px;
+            font-weight: bold;
+            transition: 0.3s;
+            margin-top: 15px;
+            font-size: 15px;
+        }
+        .btn-home:hover {
+            background: #004d4d;
+            transform: translateY(-2px);
+        }
+        @keyframes popIn {
+            0% { transform: scale(0); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes shrink {
+            from { width: 100%; }
+            to { width: 0%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="thankyou-card">
+        <div class="icon-box">✉️</div>
+        <h1>Richiesta Inviata con Successo!</h1>
+        <p>Grazie per averci contattato. Abbiamo preso in carico i tuoi dati tecnici. Una risposta o un feedback sul progetto ti verranno inviati nel minor tempo possibile dal nostro ufficio operativo.</p>
+        
+        <div class="countdown-container">
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill"></div>
+            </div>
+            <div class="text-redirect">
+                Verrai reindirizzato alla pagina iniziale tra <span id="countdown">5</span> secondi...
+            </div>
+        </div>
+
+        <a href="index.html" class="btn-home">Torna alla Home adesso</a>
+    </div>
+
+    <script>
+        // Gestione del numero di secondi a schermo calante
+        let secondi = 5;
+        const targetElement = document.getElementById('countdown');
+        
+        const intervallo = setInterval(() => {
+            secondi--;
+            if(targetElement) targetElement.textContent = secondi;
+            if(secondi <= 0) {
+                clearInterval(intervallo);
+                window.location.href = 'index.html';
+            }
+        }, 1000);
+    </script>
+</body>
+</html>
