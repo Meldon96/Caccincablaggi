@@ -581,28 +581,7 @@
         </div>
     </div>
 </section>
-<section class="section" style="background: #fff;">
-    <div class="container">
-        <h2>Cosa dicono i nostri clienti</h2>
-        <p class="section-intro">La precisione e l'affidabilità si vedono dai fatti. Ecco l'esperienza di chi lavora regolarmente con Davide.</p>
-        
-        <div class="cards" style="max-width: 900px; margin: auto;">
-            <div class="card" style="border-left: 4px solid #ff6b35;">
-                <p style="font-style: italic; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
-                    "Collaboriamo con Davide per i picchi di produzione sulla quadristica conto terzi. Massima precisione nel rispetto degli schemi elettrici, cablaggi puliti ordinati e consegne puntuali. Un partner affidabile per l'automazione."
-                </p>
-                <p style="font-weight: bold; color: #006666; font-size: 15px;">— Responsabile Produzione, Azienda di Automazione (Padova)</p>
-            </div>
-            
-            <div class="card" style="border-left: 4px solid #006666;">
-                <p style="font-style: italic; font-size: 16px; line-height: 1.6; margin-bottom: 15px;">
-                    "Dovevo installare la linea per il piano a induzione e sistemare il quadro di casa a Pianiga. Davide è stato rapidissimo, mi ha spiegato tutto con estrema chiarezza e il preventivo online è stato facilissimo da compilare. Consigliatissimo!"
-                </p>
-                <p style="font-weight: bold; color: #ff6b35; font-size: 15px;">— Marco R., Privato (Pianiga)</p>
-            </div>
-        </div>
-    </div>
-</section>
+
 <section class="hero" style="padding:60px 0; background: linear-gradient(135deg,#006666,#004d4d);">
     <div class="container" style="text-align:center;">
         <h2 style="color:white;font-size:36px;">Hai un project da sottoporci?</h2>
@@ -624,7 +603,7 @@
         </div>
 
         <div id="form-industriale">
-           <form id="form-b2b-ele" action="https://script.google.com/macros/s/AKfycbzW29zajWx2Ivlp1sTRRQIaapFv7jFJdmw0_vVe2_OVGX-pBR16MuTxxUDMzd10WzZN/exec" method="POST" enctype="multipart/form-data">
+           <form id="form-b2b-ele" action="https://script.google.com/macros/s/AKfycbwxWvrEV9qqSga2oZFlm5H8reCkAd8ncZowk3ev5K19U72rPyrKZnM7caamjJPZokCk/exec" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_template" value="box">
                 <input type="hidden" name="_subject" id="subject-b2b" value="⚡ Nuova Documentazione Macchina Ricevuta">
@@ -785,7 +764,7 @@
         </div>
 
         <div id="form-civile">
-           <form id="form-b2c-ele" action="https://script.google.com/macros/s/AKfycbzW29zajWx2Ivlp1sTRRQIaapFv7jFJdmw0_vVe2_OVGX-pBR16MuTxxUDMzd10WzZN/exec" method="POST" enctype="multipart/form-data">
+           <form id="form-b2c-ele" action="https://script.google.com/macros/s/AKfycbwxWvrEV9qqSga2oZFlm5H8reCkAd8ncZowk3ev5K19U72rPyrKZnM7caamjJPZokCk/exec" method="POST" enctype="multipart/form-data">
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_template" value="box">
                 <input type="hidden" name="_subject" id="subject-b2c" value="🏠 Nuovo Preventivo Civile">
@@ -910,7 +889,7 @@
 <footer>
     <div class="container">
         <p style="font-weight: bold; font-size: 18px;">Caccin Cablaggi di Caccin Davide</p>
-        <p>Sede Operativa: Pianiga (Venezia) | Interventi in tutto il Veneto per la quadristica industriale</p>
+        <p>Sede Operativa: Pianiga (Venezia) | Interventi in tutto il Veneto for la quadristica industriale</p>
         <p style="font-size: 13px; margin-top: 15px; opacity: 0.7;">
             &copy; 2026 Caccin Cablaggi. Tutti i diritti riservati. P.IVA 04473340277 | <a href="privacy.html" target="_blank" style="color: #fff; text-decoration: underline;">Privacy Policy</a>
         </p>
@@ -1082,7 +1061,7 @@
             <h3 style="font-size: 26px; color: #006666; margin-bottom: 15px;">Grazie ${nomeCliente}!</h3>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
                 I tuoi dati e la documentazione sono stati trasmessi con successo a <strong>Caccin Cablaggi</strong>.<br>
-                I file sono stati salvati su Google Drive e Davide ti risponderà il prima possibile.
+                I file sono stati allegati alla mail e salvati su Google Drive. Davide ti risponderà il prima possibile.
             </p>
             <span style="font-size: 40px;">✉️</span>
         `;
@@ -1159,7 +1138,7 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-            btnInvia.innerText = "Caricamento su Google Drive in corso...";
+            btnInvia.innerText = "Invio mail con allegati in corso...";
 
             const response = await fetch(form.action, {
                 method: 'POST',
