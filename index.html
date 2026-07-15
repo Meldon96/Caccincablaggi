@@ -514,7 +514,7 @@
         <div class="cards">
             <div class="card">
                 <h3>Oltre 10 anni di esperienza</h3>
-                <p>Esperienza maturata nel cablaggio conto terzi per l'automazione industriale e nell'impiantistica residenziale.</p>
+                <p>Esperienza maturata nel cablaggio conto terzi per l'automazione industriale and nell'impiantistica residenziale.</p>
             </div>
             <div class="card">
                 <h3>Flessibilità e Intervento Rapido</h3>
@@ -744,13 +744,13 @@
                     <div class="card">
                         <h3>Documentazione</h3>
                         <label>Schema elettrico</label>
-                        <input type="file" name="📄 Allegato_Schema">
+                        <input type="file" name="📄 Allegato_Schema" id="allegato-schema">
 
                         <label>Layout quadro</label>
-                        <input type="file" name="📄 Allegato_Layout">
+                        <input type="file" name="📄 Allegato_Layout" id="allegato-layout">
 
                         <label>Distinta base</label>
-                        <input type="file" name="📄 Allegato_BOM">
+                        <input type="file" name="📄 Allegato_BOM" id="allegato-bom">
                     </div>
 
                     <div class="card">
@@ -1051,8 +1051,22 @@
     });
 
     // =========================================================================
-    // TRUCCO JS + INVIO REALE IN BACKGROUND (Senza ricaricare la pagina)
+    // TRUCCO JS + INVIO REALE CON FILE IN BACKGROUND (Conversione Base64)
     // =========================================================================
+
+    // Funzione helper per convertire un file in Base64
+    function convertiFileInBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve({
+                base64: reader.result.split(',')[1],
+                mimeType: file.type,
+                fileName: file.name
+            });
+            reader.onerror = error => reject(error);
+            reader.readAsDataURL(file);
+        });
+    }
 
     // Funzione universale per mostrare il messaggio di ringraziamento sul posto
     function mostraRingraziamentoSulPosto(formElement, nomeCliente) {
@@ -1068,7 +1082,7 @@
             <h3 style="font-size: 26px; color: #006666; margin-bottom: 15px;">Grazie ${nomeCliente}!</h3>
             <p style="font-size: 16px; line-height: 1.6; margin-bottom: 20px;">
                 I tuoi dati e la documentazione sono stati trasmessi con successo a <strong>Caccin Cablaggi</strong>.<br>
-                Davide analizzerà le tue specifiche e ti risponderà il prima possibile.
+                I file sono stati salvati su Google Drive e Davide ti risponderà il prima possibile.
             </p>
             <span style="font-size: 40px;">✉️</span>
         `;
@@ -1078,8 +1092,8 @@
         grazieBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
-    // Gestione Invio Form INDUSTRIALE (B2B)
-    document.getElementById('form-b2b-ele').addEventListener('submit', function(e) {
+    // Gestione Invio Form INDUSTRIALE (B2B) con conversione file integrata
+    document.getElementById('form-b2b-ele').addEventListener('submit', async function(e) {
         e.preventDefault(); 
         
         const form = this;
@@ -1092,49 +1106,93 @@
             tipoLavoro = valori.join(' + ');
         }
         
-        document.getElementById('subject-b2b').value = `⚡ ${ragSoc} - ${tipoLavoro}`;
+        // Imposta dinamicamente l'oggetto dell'email
+        const subjectValue = `⚡ ${ragSoc} - ${tipoLavoro}`;
+        document.getElementById('subject-b2b').value = subjectValue;
         
         const btnInvia = form.querySelector('.btn');
-        btnInvia.innerText = "Invio in corso (caricamento file)...";
+        btnInvia.innerText = "Preparazione file e invio in corso...";
         btnInvia.style.opacity = "0.7";
         btnInvia.disabled = true;
 
-        // Limite di attesa di 25 secondi (se i file sono troppo pesanti si sblocca)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 25000);
+        try {
+            // Estrazione di tutti i campi normali dal form
+            const formData = new FormData(form);
+            const fields = {};
+            formData.forEach((value, key) => {
+                if (typeof value === 'string' && key !== '📄 Allegato_Schema' && key !== '📄 Allegato_Layout' && key !== '📄 Allegato_BOM') {
+                    // Gestione array per checkbox multi-selezione
+                    if (key.endsWith('[]')) {
+                        const cleanKey = key.replace('[]', '');
+                        if (!fields[cleanKey]) fields[cleanKey] = [];
+                        fields[cleanKey].push(value);
+                    } else {
+                        fields[key] = value;
+                    }
+                }
+            });
+            
+            // Per i checkbox multi-valore facciamo un join con virgola
+            for (let k in fields) {
+                if (Array.isArray(fields[k])) {
+                    fields[k] = fields[k].join(', ');
+                }
+            }
 
-        fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            signal: controller.signal
-        })
-        .then(response => {
+            // Elaborazione e conversione dei file in base64
+            const files = {};
+            const inputSchema = document.getElementById('allegato-schema').files[0];
+            const inputLayout = document.getElementById('allegato-layout').files[0];
+            const inputBom = document.getElementById('allegato-bom').files[0];
+
+            if (inputSchema) files['Schema Elettrico'] = await convertiFileInBase64(inputSchema);
+            if (inputLayout) files['Layout Quadro'] = await convertiFileInBase64(inputLayout);
+            if (inputBom) files['Distinta Base (BOM)'] = await convertiFileInBase64(inputBom);
+
+            // Pacchetto dati completo da inviare
+            const payload = {
+                fields: fields,
+                files: files
+            };
+
+            // Limite di attesa di 45 secondi (gestione file grandi)
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 45000);
+
+            btnInvia.innerText = "Caricamento su Google Drive in corso...";
+
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8' // Risolve problemi CORS con Apps Script
+                },
+                signal: controller.signal
+            });
+
             clearTimeout(timeoutId);
-            if(response.ok) {
+
+            if (response.ok) {
                 mostraRingraziamentoSulPosto(form, ragSoc);
             } else {
-                alert("Si è verificato un errore nell'invio. Verifica che la mail sia registrata su FormSubmit o riprova.");
-                btnInvia.innerText = "🚀 INVIA LA DOCUMENTAZIONE DELLA MACCHINA";
-                btnInvia.disabled = false;
-                btnInvia.style.opacity = "1";
+                throw new Error("Errore di risposta del server");
             }
-        })
-        .catch(error => {
-            clearTimeout(timeoutId);
+
+        } catch (error) {
             console.error('Errore:', error);
             if (error.name === 'AbortError') {
-                alert("Invio annullato: i file allegati sono troppo pesanti o la connessione è instabile. Riprova allegando file più leggeri o scrivi a caccin.cablaggi@gmail.com");
+                alert("Invio annullato: i file allegati sono troppo pesanti per la tua connessione attuale. Riprova allegando file più leggeri o scrivi a caccin.cablaggi@gmail.com");
             } else {
                 alert("Errore di connessione o blocco di rete. Se il problema persiste, scrivici direttamente a caccin.cablaggi@gmail.com");
             }
             btnInvia.innerText = "🚀 INVIA LA DOCUMENTAZIONE DELLA MACCHINA";
             btnInvia.disabled = false;
             btnInvia.style.opacity = "1";
-        });
+        }
     });
 
     // Gestione Invio Form CIVILE (B2C)
-    document.getElementById('form-b2c-ele').addEventListener('submit', function(e) {
+    document.getElementById('form-b2c-ele').addEventListener('submit', async function(e) {
         e.preventDefault(); 
         
         const form = this;
@@ -1142,45 +1200,69 @@
         const selectIntervento = document.getElementById('select-tipo-civile');
         const testoIntervento = selectIntervento.options[selectIntervento.selectedIndex].text;
         
-        document.getElementById('subject-b2c').value = `🏠 ${nomeCliente} - Civile (${testoIntervento})`;
+        // Imposta l'oggetto dell'email
+        const subjectValue = `🏠 ${nomeCliente} - Civile (${testoIntervento})`;
+        document.getElementById('subject-b2c').value = subjectValue;
         
         const btnInvia = form.querySelector('.btn');
         btnInvia.innerText = "Invio in corso...";
         btnInvia.style.opacity = "0.7";
         btnInvia.disabled = true;
 
-        // Limite di attesa di 15 secondi (non ci sono allegati)
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 15000);
+        try {
+            // Estrazione campi
+            const formData = new FormData(form);
+            const fields = {};
+            formData.forEach((value, key) => {
+                if (typeof value === 'string') {
+                    if (key.endsWith('[]')) {
+                        const cleanKey = key.replace('[]', '');
+                        if (!fields[cleanKey]) fields[cleanKey] = [];
+                        fields[cleanKey].push(value);
+                    } else {
+                        fields[key] = value;
+                    }
+                }
+            });
 
-        fetch(form.action, {
-            method: 'POST',
-            body: new FormData(form),
-            signal: controller.signal
-        })
-        .then(response => {
+            for (let k in fields) {
+                if (Array.isArray(fields[k])) {
+                    fields[k] = fields[k].join(', ');
+                }
+            }
+
+            const payload = {
+                fields: fields,
+                files: {} // Nessun file previsto per la sezione civile
+            };
+
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000);
+
+            const response = await fetch(form.action, {
+                method: 'POST',
+                body: JSON.stringify(payload),
+                headers: {
+                    'Content-Type': 'text/plain;charset=utf-8'
+                },
+                signal: controller.signal
+            });
+
             clearTimeout(timeoutId);
-            if(response.ok) {
+
+            if (response.ok) {
                 mostraRingraziamentoSulPosto(form, nomeCliente);
             } else {
-                alert("Si è verificato un errore nell'invio. Riprova o contattaci direttamente.");
-                btnInvia.innerText = "🚀 INVIA RICHIESTA CIVILE";
-                btnInvia.disabled = false;
-                btnInvia.style.opacity = "1";
+                throw new Error("Errore server");
             }
-        })
-        .catch(error => {
-            clearTimeout(timeoutId);
+
+        } catch (error) {
             console.error('Errore:', error);
-            if (error.name === 'AbortError') {
-                alert("Tempo scaduto. Il server di invio sta impiegando troppo tempo a rispondere. Prova a ricaricare la pagina o scrivi direttamente a caccin.cablaggi@gmail.com");
-            } else {
-                alert("Errore di connessione o blocco di rete. Verifica la connessione o scrivici a caccin.cablaggi@gmail.com");
-            }
+            alert("Si è verificato un errore nell'invio o tempo scaduto. Riprova o scrivici a caccin.cablaggi@gmail.com");
             btnInvia.innerText = "🚀 INVIA RICHIESTA CIVILE";
             btnInvia.disabled = false;
             btnInvia.style.opacity = "1";
-        });
+        }
     });
 </script>
 </body>
