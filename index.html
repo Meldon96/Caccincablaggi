@@ -661,7 +661,7 @@
                         <label>È un prototipo o una produzione in serie?</label>
                         <div style="text-align: left; margin-top: 5px; margin-bottom: 15px;">
                             <label><input type="radio" name="🔄 Tipo Commessa" value="Prototipo" checked> Prototipo</label>
-                            <label><input type="radio" name="🔄 Tipo Commessa" value="Produzione in serie"> Produzione in serie</label>
+                            <label><input type="radio" name="🔄 Tipo Commessa" value="Produzione in serie"> Production in serie</label>
                         </div>
 
                         <label>Numero macchine previste (opzionale)</label>
@@ -682,7 +682,7 @@
                         <h3>Tipo di lavorazione</h3>
                         <div style="text-align: left; margin-top: 10px;">
                             <label><input type="checkbox" class="tipo-lav-cb" name="🔧 Servizio Richiesto[]" value="Quadro elettrico"> Quadro elettrico</label>
-                            <label><input type="checkbox" class="tipo-lav-cb" name="Campi tecnici modificati" value="Quadro elettropneumatico"> Quadro elettropneumatico</label>
+                            <label><input type="checkbox" class="tipo-lav-cb" name="🔧 Servizio Richiesto[]" value="Quadro elettropneumatico"> Quadro elettropneumatico</label>
                             <label><input type="checkbox" class="tipo-lav-cb" name="🔧 Servizio Richiesto[]" value="Assemblaggio elettromeccanico"> Assemblaggio elettromeccanico</label>
                             <label><input type="checkbox" class="tipo-lav-cb" name="🔧 Servizio Richiesto[]" value="Altro"> Altro</label>
                         </div>
@@ -785,7 +785,7 @@
         </div>
 
         <div id="form-civile">
-            <form id="form-b2c-ele" action="https://formsubmit.co/ajax/caccin.cablaggi@gmail.com" method="POST" enctype="multipart/form-data">
+            <form id="form-b2c-ele" action="https://formsubmit.co/ajax/caccin.cablaggi@gmail.com" method="POST">
                 <input type="hidden" name="_captcha" value="false">
                 <input type="hidden" name="_template" value="box">
                 <input type="hidden" name="_subject" id="subject-b2c" value="🏠 Nuovo Preventivo Civile">
@@ -1056,14 +1056,13 @@
 
     // Funzione universale per mostrare il messaggio di ringraziamento sul posto
     function mostraRingraziamentoSulPosto(formElement, nomeCliente) {
-        // Creiamo il box di ringraziamento stile "Card" con i colori del tuo sito
         const grazieBox = document.createElement('div');
         grazieBox.className = 'card show';
         grazieBox.style.textAlign = 'center';
         grazieBox.style.padding = '40px 20px';
         grazieBox.style.margin = '20px auto';
         grazieBox.style.maxWidth = '600px';
-        grazieBox.style.border = '2px solid #006666'; // Verde del tuo sito
+        grazieBox.style.border = '2px solid #006666'; 
         
         grazieBox.innerHTML = `
             <h3 style="font-size: 26px; color: #006666; margin-bottom: 15px;">Grazie ${nomeCliente}!</h3>
@@ -1074,17 +1073,14 @@
             <span style="font-size: 40px;">✉️</span>
         `;
         
-        // Sostituiamo il form con il messaggio di ringraziamento
         formElement.innerHTML = '';
         formElement.appendChild(grazieBox);
-        
-        // Scrolla la pagina leggermente per centrare il messaggio sullo schermo
         grazieBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
     }
 
     // Gestione Invio Form INDUSTRIALE (B2B)
     document.getElementById('form-b2b-ele').addEventListener('submit', function(e) {
-        e.preventDefault(); // Blocca l'errore della pagina bianca o non raggiungibile
+        e.preventDefault(); 
         
         const form = this;
         const ragSoc = document.getElementById('b2b-rag-soc').value.trim() || 'Azienda';
@@ -1096,60 +1092,74 @@
             tipoLavoro = valori.join(' + ');
         }
         
-        // Imposta l'oggetto dell'email con emoji
         document.getElementById('subject-b2b').value = `⚡ ${ragSoc} - ${tipoLavoro}`;
         
-        // Trasforma il tasto invio in uno stato di caricamento
         const btnInvia = form.querySelector('.btn');
-        btnInvia.innerText = "Invio in corso...";
+        btnInvia.innerText = "Invio in corso (caricamento file)...";
         btnInvia.style.opacity = "0.7";
         btnInvia.disabled = true;
 
-        // Invio invisibile (AJAX) a FormSubmit
+        // Limite di attesa di 25 secondi (se i file sono troppo pesanti si sblocca)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 25000);
+
         fetch(form.action, {
             method: 'POST',
-            body: new FormData(form)
+            body: new FormData(form),
+            signal: controller.signal
         })
         .then(response => {
+            clearTimeout(timeoutId);
             if(response.ok) {
                 mostraRingraziamentoSulPosto(form, ragSoc);
             } else {
-                alert("Si è verificato un errore nell'invio. Riprova o contattaci direttamente.");
+                alert("Si è verificato un errore nell'invio. Verifica che la mail sia registrata su FormSubmit o riprova.");
                 btnInvia.innerText = "🚀 INVIA LA DOCUMENTAZIONE DELLA MACCHINA";
                 btnInvia.disabled = false;
                 btnInvia.style.opacity = "1";
             }
         })
         .catch(error => {
+            clearTimeout(timeoutId);
             console.error('Errore:', error);
-            alert("Errore di connessione. Controlla la tua rete.");
+            if (error.name === 'AbortError') {
+                alert("Invio annullato: i file allegati sono troppo pesanti o la connessione è instabile. Riprova allegando file più leggeri o scrivi a caccin.cablaggi@gmail.com");
+            } else {
+                alert("Errore di connessione o blocco di rete. Se il problema persiste, scrivici direttamente a caccin.cablaggi@gmail.com");
+            }
+            btnInvia.innerText = "🚀 INVIA LA DOCUMENTAZIONE DELLA MACCHINA";
+            btnInvia.disabled = false;
+            btnInvia.style.opacity = "1";
         });
     });
 
     // Gestione Invio Form CIVILE (B2C)
     document.getElementById('form-b2c-ele').addEventListener('submit', function(e) {
-        e.preventDefault(); // Blocca l'errore della pagina bianca o non raggiungibile
+        e.preventDefault(); 
         
         const form = this;
         const nomeCliente = document.getElementById('b2c-nome-cliente').value.trim() || 'Cliente';
         const selectIntervento = document.getElementById('select-tipo-civile');
         const testoIntervento = selectIntervento.options[selectIntervento.selectedIndex].text;
         
-        // Imposta l'oggetto dell'email con emoji
         document.getElementById('subject-b2c').value = `🏠 ${nomeCliente} - Civile (${testoIntervento})`;
         
-        // Modifica temporanea del pulsante
         const btnInvia = form.querySelector('.btn');
         btnInvia.innerText = "Invio in corso...";
         btnInvia.style.opacity = "0.7";
         btnInvia.disabled = true;
 
-        // Invio invisibile (AJAX) a FormSubmit
+        // Limite di attesa di 15 secondi (non ci sono allegati)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 15000);
+
         fetch(form.action, {
             method: 'POST',
-            body: new FormData(form)
+            body: new FormData(form),
+            signal: controller.signal
         })
         .then(response => {
+            clearTimeout(timeoutId);
             if(response.ok) {
                 mostraRingraziamentoSulPosto(form, nomeCliente);
             } else {
@@ -1160,11 +1170,18 @@
             }
         })
         .catch(error => {
+            clearTimeout(timeoutId);
             console.error('Errore:', error);
-            alert("Errore di connessione. Controlla la tua rete.");
+            if (error.name === 'AbortError') {
+                alert("Tempo scaduto. Il server di invio sta impiegando troppo tempo a rispondere. Prova a ricaricare la pagina o scrivi direttamente a caccin.cablaggi@gmail.com");
+            } else {
+                alert("Errore di connessione o blocco di rete. Verifica la connessione o scrivici a caccin.cablaggi@gmail.com");
+            }
+            btnInvia.innerText = "🚀 INVIA RICHIESTA CIVILE";
+            btnInvia.disabled = false;
+            btnInvia.style.opacity = "1";
         });
     });
 </script>
 </body>
 </html>
-
