@@ -1071,6 +1071,7 @@
     }
 
     // Gestione Invio Form INDUSTRIALE (B2B) con conversione file integrata
+   // Gestione Invio Form INDUSTRIALE (B2B) con conversione file integrata
     document.getElementById('form-b2b-ele').addEventListener('submit', async function(e) {
         e.preventDefault(); 
         
@@ -1084,7 +1085,6 @@
             tipoLavoro = valori.join(' + ');
         }
         
-        // Imposta dinamicamente l'oggetto dell'email
         const subjectValue = `⚡ ${ragSoc} - ${tipoLavoro}`;
         document.getElementById('subject-b2b').value = subjectValue;
         
@@ -1094,12 +1094,10 @@
         btnInvia.disabled = true;
 
         try {
-            // Estrazione di tutti i campi normali dal form
             const formData = new FormData(form);
             const fields = {};
             formData.forEach((value, key) => {
                 if (typeof value === 'string' && key !== '📄 Allegato_Schema' && key !== '📄 Allegato_Layout' && key !== '📄 Allegato_BOM') {
-                    // Gestione array per checkbox multi-selezione
                     if (key.endsWith('[]')) {
                         const cleanKey = key.replace('[]', '');
                         if (!fields[cleanKey]) fields[cleanKey] = [];
@@ -1110,40 +1108,41 @@
                 }
             });
             
-            // Per i checkbox multi-valore facciamo un join con virgola
             for (let k in fields) {
                 if (Array.isArray(fields[k])) {
                     fields[k] = fields[k].join(', ');
                 }
             }
 
-            // Elaborazione e conversione dei file in base64
+            // Gestione sicura degli allegati (evita crash se vuoti)
             const files = {};
-            const inputSchema = document.getElementById('allegato-schema').files[0];
-            const inputLayout = document.getElementById('allegato-layout').files[0];
-            const inputBom = document.getElementById('allegato-bom').files[0];
+            const schemaEl = document.getElementById('allegato-schema');
+            const layoutEl = document.getElementById('allegato-layout');
+            const bomEl = document.getElementById('allegato-bom');
 
-            if (inputSchema) files['Schema Elettrico'] = await convertiFileInBase64(inputSchema);
-            if (inputLayout) files['Layout Quadro'] = await convertiFileInBase64(inputLayout);
-            if (inputBom) files['Distinta Base (BOM)'] = await convertiFileInBase64(inputBom);
+            const fileSchema = (schemaEl && schemaEl.files) ? schemaEl.files[0] : null;
+            const fileLayout = (layoutEl && layoutEl.files) ? layoutEl.files[0] : null;
+            const fileBom = (bomEl && bomEl.files) ? bomEl.files[0] : null;
 
-            // Pacchetto dati completo da inviare
+            if (fileSchema) files['Schema Elettrico'] = await convertiFileInBase64(fileSchema);
+            if (fileLayout) files['Layout Quadro'] = await convertiFileInBase64(fileLayout);
+            if (fileBom) files['Distinta Base (BOM)'] = await convertiFileInBase64(fileBom);
+
             const payload = {
                 fields: fields,
                 files: files
             };
 
-            // Limite di attesa di 45 secondi (gestione file grandi)
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 45000);
 
-            btnInvia.innerText = "Invio mail con allegati in corso...";
+            btnInvia.innerText = "Invio in corso...";
 
             const response = await fetch(form.action, {
                 method: 'POST',
                 body: JSON.stringify(payload),
                 headers: {
-                    'Content-Type': 'text/plain;charset=utf-8' // Risolve problemi CORS con Apps Script
+                    'Content-Type': 'text/plain;charset=utf-8'
                 },
                 signal: controller.signal
             });
@@ -1151,17 +1150,23 @@
             clearTimeout(timeoutId);
 
             if (response.ok) {
-                mostraRingraziamentoSulPosto(form, ragSoc);
+                const responseData = await response.json();
+                // Ora controlliamo se Google ha riscontrato errori interni
+                if (responseData.result === "success") {
+                    mostraRingraziamentoSulPosto(form, ragSoc);
+                } else {
+                    throw new Error(responseData.error || "Errore sconosciuto sul server di Google.");
+                }
             } else {
-                throw new Error("Errore di risposta del server");
+                throw new Error("Il server di Google non ha risposto correttamente.");
             }
 
         } catch (error) {
-            console.error('Errore:', error);
+            console.error('Errore dettagliato:', error);
             if (error.name === 'AbortError') {
-                alert("Invio annullato: i file allegati sono troppo pesanti per la tua connessione attuale. Riprova allegando file più leggeri o scrivi a caccin.cablaggi@gmail.com");
+                alert("Invio annullato: i file allegati richiedono troppo tempo per essere caricati. Riprova con file più leggeri.");
             } else {
-                alert("Errore di connessione o blocco di rete. Se il problema persiste, scrivici direttamente a caccin.cablaggi@gmail.com");
+                alert("Si è verificato un errore: " + error.message + "\n\nSe il problema persiste, scrivi direttamente a caccin.cablaggi@gmail.com");
             }
             btnInvia.innerText = "🚀 INVIA LA DOCUMENTAZIONE DELLA MACCHINA";
             btnInvia.disabled = false;
