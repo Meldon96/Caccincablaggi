@@ -474,6 +474,13 @@
             grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
             gap:25px;
         }
+        /* Stile FAQ */
+.faq-section { padding: 50px 0; background: #f8fafc; }
+.faq-container { max-width: 800px; margin: auto; }
+.faq-item { background: white; margin-bottom: 10px; border-radius: 8px; border: 1px solid #e2e8f0; overflow: hidden; }
+.faq-question { width: 100%; padding: 20px; text-align: left; background: none; border: none; font-size: 18px; font-weight: bold; color: #006666; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.faq-answer { padding: 0 20px; max-height: 0; overflow: hidden; transition: max-height 0.3s ease-out; color: #475569; }
+.faq-answer p { padding-bottom: 20px; }
         
         .gallery img{
             width:100%;
@@ -971,6 +978,31 @@
         </div>
     </div>
 </div>
+    <section class="section faq-section">
+    <div class="container faq-container">
+        <h2 style="margin-bottom: 40px;">Domande Frequenti (FAQ)</h2>
+        
+        <div class="faq-item">
+            <button class="faq-question">Realizzate anche piccoli lotti? <span>+</span></button>
+            <div class="faq-answer"><p>Certamente. Siamo strutturati per gestire sia prototipi e pezzi unici, sia produzioni in serie con consegne scaglionate.</p></div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-question">Firmate accordi di riservatezza (NDA)? <span>+</span></button>
+            <div class="faq-answer"><p>Assolutamente sì. La tutela della tua proprietà intellettuale è una nostra priorità e siamo pronti a firmare un NDA prima di ricevere i tuoi documenti.</p></div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-question">Lavorate solo in Veneto? <span>+</span></button>
+            <div class="faq-answer"><p>Il nostro raggio d'azione principale è il territorio padovano e veneziano, ma valutiamo collaborazioni industriali in tutto il Nord Italia.</p></div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-question">Potete assemblare materiali forniti dal cliente? <span>+</span></button>
+            <div class="faq-answer"><p>Sì, lavoriamo comunemente in conto lavoro, seguendo le distinte e i materiali che ci vengono forniti.</p></div>
+        </div>
+        <div class="faq-item">
+            <button class="faq-question">Quali sono i tempi medi di consegna? <span>+</span></button>
+            <div class="faq-answer"><p>L'analisi tecnica viene effettuata in 24/48 ore. I tempi di consegna definitivi vengono concordati in fase di preventivo in base alla complessità e al volume del lotto.</p></div>
+        </div>
+    </div>
 
 <section class="section" id="preventivo" style="background: #f8fafc;">
     <div class="container">
@@ -1364,6 +1396,17 @@
 
     // 3. INVIO FORM (B2B/B2C) - [Qui va inserito il codice di invio che avevi prima]
     // Assicurati che il codice `formB2b.addEventListener` sia qui sotto.
+    document.querySelectorAll('.faq-question').forEach(button => {
+    button.addEventListener('click', () => {
+        const answer = button.nextElementSibling;
+        button.classList.toggle('active');
+        if (button.classList.contains('active')) {
+            answer.style.maxHeight = answer.scrollHeight + "px";
+        } else {
+            answer.style.maxHeight = 0;
+        }
+    });
+});
 </script>
 </body>
 </html>
