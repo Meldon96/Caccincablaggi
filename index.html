@@ -1414,21 +1414,20 @@
         if(testo) addMessage(testo, 'user');
         botInput.value = '';
     });
-
-    // 3. INVIO FORM (B2B/B2C) - [Qui va inserito il codice di invio che avevi prima]
-    // Assicurati che il codice `formB2b.addEventListener` sia qui sotto.
+// 3. INVIO FORM E LOGICA FINALE
     document.querySelectorAll('.faq-question').forEach(button => {
-    button.addEventListener('click', () => {
-        const answer = button.nextElementSibling;
-        button.classList.toggle('active');
-        if (button.classList.contains('active')) {
-            answer.style.maxHeight = answer.scrollHeight + "px";
-        } else {
-            answer.style.maxHeight = 0;
-        }
+        button.addEventListener('click', () => {
+            const answer = button.nextElementSibling;
+            button.classList.toggle('active');
+            if (button.classList.contains('active')) {
+                answer.style.maxHeight = answer.scrollHeight + "px";
+            } else {
+                answer.style.maxHeight = 0;
+            }
+        });
     });
-});
-  // --- LOGICA CONTATORI ---
+
+    // --- LOGICA CONTATORI ---
     const annoCorrente = 2026;
     const elementoAnni = document.getElementById('anni-esperienza');
     if (elementoAnni) {
@@ -1436,7 +1435,6 @@
     }
 
     const counters = document.querySelectorAll('.counter');
-
     const animateCounters = () => {
         counters.forEach(counter => {
             const updateCount = () => {
