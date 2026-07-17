@@ -17,6 +17,29 @@
     <meta name="robots" content="index,follow">
 
     <style>
+        .top-bar {
+    background-color: #003333; /* Un colore verde scuro professionale, in tinta col resto del sito */
+    color: white;              /* Il colore del testo sarà bianco per contrasto */
+    font-size: 13px;           /* Carattere piccolo perché è una striscia di servizio */
+    padding: 8px 20px;         /* Spazio interno: 8px sopra/sotto, 20px ai lati */
+    display: flex;             /* Serve per allineare gli elementi in riga */
+    justify-content: flex-end; /* Sposta tutto il blocco dei contatti verso destra */
+}
+
+.contact-info {
+    display: flex;
+    gap: 20px;                 /* Crea 20px di spazio vuoto tra il numero, la mail e l'indirizzo */
+}
+
+.contact-info a {
+    color: white;              /* Il link dell'indirizzo deve essere bianco */
+    text-decoration: none;     /* Rimuove la sottolineatura standard del link */
+    cursor: pointer;           /* Mostra la manina quando ci passi sopra col mouse */
+}
+
+.contact-info a:hover {
+    text-decoration: underline; /* Sottolinea quando l'utente ci passa sopra col mouse */
+}
         /* Stile per i bottoni del CabloBot */
 .bot-buttons { 
     display: flex; 
@@ -847,6 +870,21 @@
     </style>
 </head>
 <body>
+    <!-- Top Bar Informativa -->
+<div class="top-bar">
+    <div class="contact-info">
+        <span>📞 +39 339 2859037</span>
+        <span>📧 caccin.cablaggi@gmail.com</span>
+        <a href="https://www.google.com/maps/place/Via+Cavin+Maggiore,+5,+30030+Pianiga+VE/@45.468442,11.9792768,17z/data=!3m1!4b1!4m6!3m5!1s0x477ece341fb970eb:0xbf3b5fc3ceab39b5!8m2!3d45.468442!4d11.9818517!16s%2Fg%2F11csndrqzz?entry=ttu&g_ep=EgoyMDI2MDcxNC4wIKXMDSoASAFQAw%3D%3D" target="_blank">
+            📍 Via Cavin Maggiore 5, Pianiga (VE)
+        </a>
+    </div>
+</div>
+
+<!-- Qui inizia il tuo header esistente -->
+<header>
+    ...
+</header>
         
 <div id="progress-bar"></div>
 
