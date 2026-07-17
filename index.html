@@ -1428,11 +1428,12 @@
         }
     });
 });
-  
-    // Calcolo automatico anni di esperienza (dal 2016 al 2026)
+  // --- LOGICA CONTATORI ---
     const annoCorrente = 2026;
-    document.getElementById('anni-esperienza').innerText = (annoCorrente - 2016);
-    document.getElementById('anni-esperienza').setAttribute('data-target', annoCorrente - 2016);
+    const elementoAnni = document.getElementById('anni-esperienza');
+    if (elementoAnni) {
+        elementoAnni.setAttribute('data-target', annoCorrente - 2016);
+    }
 
     const counters = document.querySelectorAll('.counter');
 
@@ -1462,7 +1463,6 @@
         }
     }, { threshold: 0.5 });
 
-    // Assicurati che l'elemento .counters esista nella pagina
     const counterSection = document.querySelector('.counters');
     if (counterSection) {
         observer.observe(counterSection);
