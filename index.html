@@ -1306,7 +1306,7 @@
     </div>
     <div class="cablobot-body" id="bot-body">
         <div class="msg bot">
-            Ciao! Sono CabloBot, l'assistente virtuale di Caccin Cablaggi. Come posso aiutarti oggi?
+            mostraMenuPrincipale();
             <div class="cablobot-options">
                 <button class="opt-btn" onclick="botOption('industriale')">⚙️ Preventivo Quadri o Assemblaggi (B2B)</button>
                 <button class="opt-btn" onclick="botOption('civile')">🏠 Impianti Civili o Guasti Casa (B2C)</button>
@@ -1386,34 +1386,60 @@
         addMessage(risposta, 'bot');
         setTimeout(() => addMessage('Per finalizzare, compila il form tecnico qui sotto.', 'bot'), 1000);
     }
+function botOption(opt) {
+        // Pulisce l'area messaggi dopo la scelta per non creare confusione
+        botBody.innerHTML = ''; 
+        addMessage('Hai scelto: <b>' + opt.toUpperCase() + '</b>', 'user');
 
-    function botOption(opt) {
-        if(opt === 'industriale') {
-            addMessage('Vorrei un preventivo industriale.', 'user');
-            setTimeout(() => {
-                addMessage('Capito. Come definiresti la priorità del progetto?', 'bot');
-                mostraTastiPriorita();
-            }, 800);
-        } else if(opt === 'civile') {
-            addMessage('Informazioni per impianti civili.', 'user');
-            mostraCanale('civile');
+        // LOGICA DI NAVIGAZIONE
+        if(opt === 'start') {
+            mostraMenuPrincipale();
+        } 
+        // --- RAMO AZIENDA ---
+        else if(opt === 'azienda') {
+            mostraSottoMenu(['Richiedi Preventivo', 'Cablaggio Conto Terzi', 'Assemblaggi', 'Officina Polmone']);
+        }
+        // --- RAMO PRIVATO ---
+        else if(opt === 'privato') {
+            mostraSottoMenu(['Impianti Elettrici', 'Impianti per Casette (Legno/PVC/Alluminio)', 'Contatti']);
+        }
+        // --- AZIONI FINALI ---
+        else if(opt === 'Richiedi Preventivo') {
+            mostraCanale('industriale');
             document.getElementById('preventivo').scrollIntoView();
-        } else if(opt === 'tempistiche') {
-            addMessage('Analisi in 24/48 ore.', 'bot');
-        } else if(opt === 'nda') {
-            addMessage('Siamo disponibili a firmare NDA.', 'bot');
-        } else if(opt === 'ricontatto') {
-            addMessage('Chiama Davide al 345 417 0366.', 'bot');
-        } else if(opt === 'whatsapp') {
-            window.open('https://wa.me/393392859037', '_blank');
+        }
+        else if(opt === 'Contatti') {
+            addMessage('Puoi chiamare Davide al 345 417 0366 o scriverci su WhatsApp.', 'bot');
+        }
+        else {
+            addMessage('Certamente! Ti ho indirizzato alla sezione dedicata.', 'bot');
+            // Qui puoi aggiungere lo scroll a sezioni specifiche se vuoi
         }
     }
 
-    botSend.addEventListener('click', () => {
-        const testo = botInput.value.trim();
-        if(testo) addMessage(testo, 'user');
-        botInput.value = '';
-    });
+    // Funzioni helper per i menu
+    function mostraMenuPrincipale() {
+        addMessage('Ciao! Sono CabloBot, come posso guidarti oggi?', 'bot');
+        creaPulsanti(['Sono un Azienda', 'Sono un Privato'], ['azienda', 'privato']);
+    }
+
+    function mostraSottoMenu(opzioni) {
+        addMessage('Cosa ti interessa nello specifico?', 'bot');
+        creaPulsanti(opzioni, opzioni);
+    }
+
+    function creaPulsanti(testi, valori) {
+        const box = document.createElement('div');
+        box.className = 'cablobot-options';
+        testi.forEach((t, i) => {
+            const btn = document.createElement('button');
+            btn.className = 'opt-btn';
+            btn.innerText = t;
+            btn.onclick = () => botOption(valori[i]);
+            box.appendChild(btn);
+        });
+        botBody.appendChild(box);
+    }
 // 3. INVIO FORM E LOGICA FINALE
     document.querySelectorAll('.faq-question').forEach(button => {
         button.addEventListener('click', () => {
