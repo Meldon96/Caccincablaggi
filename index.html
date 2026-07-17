@@ -1329,8 +1329,18 @@
         </div>
     </div>
     <div class="cablobot-body" id="bot-body">
-        
+        <div class="msg bot">
+            Buongiorno, come posso esserti utile oggi?;
+            <div class="cablobot-options">
+                <button class="opt-btn" onclick="botOption('industriale')">⚙️ Preventivo Quadri o Assemblaggi (B2B)</button>
+                <button class="opt-btn" onclick="botOption('civile')">🏠 Impianti Civili o Guasti Casa (B2C)</button>
+                <button class="opt-btn" onclick="botOption('tempistiche')">⏱️ Quali sono i tempi di consegna?</button>
+                <button class="opt-btn" onclick="botOption('nda')">🔒 Come funziona la riservatezza (NDA)?</button>
+                <button class="opt-btn" onclick="botOption('ricontatto')">📞 Vorrei essere ricontattato al telefono</button>
+                <button class="opt-btn" onclick="botOption('whatsapp')">💬 Scrivere direttamente su WhatsApp</button>
+            </div>
         </div>
+    </div>
     <div class="cablobot-footer">
         <input type="text" id="cablobot-input" placeholder="Scrivi un messaggio...">
         <button id="cablobot-send">➤</button>
@@ -1338,67 +1348,88 @@
 </div>
 
 <script>
-   // --- INIZIO LOGICA BOT (Copia questo blocco) ---
-const botWindow = document.getElementById('bot-window');
-const botBody = document.getElementById('bot-body');
+    // 1. FUNZIONI DI BASE
+    const botToggle = document.getElementById('bot-toggle');
+    const botBody = document.getElementById('bot-body');
+    const botWindow = document.getElementById('bot-window');
 
-function vaiAiPreventivi() {
-    botWindow.style.display = 'none';
-    const sez = document.getElementById('preventivo');
-    if(sez) sez.scrollIntoView({ behavior: 'smooth' });
-}
-
-function botSgaio(messaggio, opzioni = null) {
-    const div = document.createElement('div');
-    div.className = 'msg bot';
-    div.innerHTML = messaggio;
-    botBody.appendChild(div);
-    if (opzioni) {
-        const box = document.createElement('div');
-        box.className = 'cablobot-options';
-        opzioni.forEach(o => {
-            const btn = document.createElement('button');
-            btn.className = 'opt-btn';
-            btn.innerText = o.testo;
-            btn.onclick = o.azione;
-            box.appendChild(btn);
-        });
-        botBody.appendChild(box);
+    function addMessage(text, sender) {
+        const div = document.createElement('div');
+        div.classList.add('msg', sender);
+        div.innerHTML = text;
+        botBody.appendChild(div);
+        botBody.scrollTop = botBody.scrollHeight;
     }
-    botBody.scrollTop = botBody.scrollHeight;
-}
 
-function mostraMenuPrincipale() {
-    botBody.innerHTML = '';
-    botSgaio("Ciao! Come posso aiutarti?", [
-        { testo: "🏢 Azienda", azione: menuAzienda },
-        { testo: "🏠 Privato", azione: menuPrivato }
-    ]);
-}
-
-function menuAzienda() {
-    botSgaio("Cosa serve alla tua officina?", [
-        { testo: "Cablaggio conto terzi", azione: () => botSgaio("Passami gli schemi o descrivi il lotto nella sezione dedicata ai preventivi.", [{ testo: "Vai ai Preventivi", azione: vaiAiPreventivi }]) },
-        { testo: "Assemblaggi", azione: () => botSgaio("Descrivi i tuoi componenti nella sezione dedicata ai preventivi.", [{ testo: "Vai ai Preventivi", azione: vaiAiPreventivi }]) }
-    ]);
-}
-
-function menuPrivato() {
-    botSgaio("Che tipo di lavoro ti serve?", [
-        { testo: "Impianti elettrici", azione: () => botSgaio("Descrivi il lavoro nella sezione dedicata ai preventivi.", [{ testo: "Vai ai Preventivi", azione: vaiAiPreventivi }]) }
-    ]);
-}
-
-// Collega il bottone di apertura (assicurati che l'ID sia 'bot-toggle')
-document.getElementById('bot-toggle').addEventListener('click', () => {
-    if (botWindow.style.display !== 'flex') {
-        botWindow.style.display = 'flex';
-        if (botBody.innerHTML === '') mostraMenuPrincipale();
-    } else {
-        botWindow.style.display = 'none';
+    // 2. LOGICA "SGAIA"
+    function botSgaio(messaggio, opzioni = null) {
+        addMessage(messaggio, 'bot');
+        if (opzioni) {
+            const box = document.createElement('div');
+            box.className = 'cablobot-options';
+            opzioni.forEach(o => {
+                const btn = document.createElement('button');
+                btn.className = 'opt-btn';
+                btn.innerText = o.testo;
+                btn.onclick = () => {
+                    addMessage(o.testo, 'user');
+                    o.azione();
+                };
+                box.appendChild(btn);
+            });
+            botBody.appendChild(box);
+        }
     }
-});
-// --- FINE LOGICA BOT ---
+
+    function menuAzienda() {
+        botSgaio("Ottimo! Cosa serve alla tua officina?", [
+            { testo: "Preventivo rapido", azione: () => document.getElementById('preventivo').scrollIntoView() },
+            { testo: "Cablaggio conto terzi", azione: () => botSgaio("Perfetto, passami gli schemi o descrivimi il lotto!") },
+            { testo: "Assemblaggi", azione: () => botSgaio("Ci occupiamo noi dei montaggi, che tipo di componenti?") },
+            { testo: "Officina Polmone", azione: () => botSgaio("Siamo pronti a integrare la tua produzione!") }
+        ]);
+    }
+
+    function menuPrivato() {
+        botSgaio("Dimmi tutto, come posso rimettere in sesto casa?", [
+            { testo: "Impianti elettrici", azione: () => botSgaio("Ok, impianti a norma e sicuri. Che tipo di lavoro?") },
+            { testo: "Casette Legno/PVC/All", azione: () => botSgaio("Specializzati in cablaggi per strutture leggere!") },
+            { testo: "Contatti / Guasti", azione: () => window.open('https://wa.me/393392859037', '_blank') }
+        ]);
+    }
+
+    function mostraMenuPrincipale() {
+        botBody.innerHTML = ''; // Pulisce solo all'apertura
+        botSgaio("Ciao! 👋 Sono il tuo assistente Caccin. Come posso aiutarti oggi?", [
+            { testo: "🏢 Sono un'Azienda", azione: menuAzienda },
+            { testo: "🏠 Sono un Privato", azione: menuPrivato }
+        ]);
+    }
+
+    // 3. APERTURA BOT
+    botToggle.addEventListener('click', () => {
+        botWindow.style.display = (botWindow.style.display === 'flex') ? 'none' : 'flex';
+        if(botBody.children.length === 0) mostraMenuPrincipale();
+    });
+
+    // 4. LOGICA CONTATORI (che avevamo già fatto)
+    const counters = document.querySelectorAll('.counter');
+    const observer = new IntersectionObserver(entries => {
+        if (entries[0].isIntersecting) {
+            counters.forEach(c => {
+                let target = +c.getAttribute('data-target');
+                let count = 0;
+                let interval = setInterval(() => {
+                    count += Math.ceil(target / 100);
+                    c.innerText = count;
+                    if (count >= target) { c.innerText = target; clearInterval(interval); }
+                }, 20);
+            });
+            observer.disconnect();
+        }
+    }, { threshold: 0.5 });
+    const section = document.querySelector('.counters');
+    if (section) observer.observe(section);
 </script>
 </body>
 </html>
