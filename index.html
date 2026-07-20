@@ -17,6 +17,7 @@
     <meta name="robots" content="index,follow">
 
     <style>
+    
         .top-bar {
     background-color: #003333; /* Un colore verde scuro professionale, in tinta col resto del sito */
     color: white;              /* Il colore del testo sarà bianco per contrasto */
@@ -923,7 +924,36 @@
     background: #64748b !important;
     margin-top: 15px !important;
     font-size: 12px !important;
+}/* --- NUOVO CODICE PER MENU MOBILE --- */
+.menu-toggle {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+    color: #006666;
+    padding: 10px;
 }
+
+@media(max-width:900px) {
+    .menu-toggle { display: block; }
+    nav {
+        display: none;
+        position: absolute;
+        top: 80px;
+        left: 0;
+        width: 100%;
+        background: white;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        z-index: 1000;
+        padding: 20px 0;
+    }
+    nav.active { display: block; }
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+    }
+}
+
     </style>
 </head>
 <body>
@@ -937,11 +967,6 @@
         </a>
     </div>
 </div>
-
-<!-- Qui inizia il tuo header esistente -->
-<header>
-    ...
-</header>
         
 <div id="progress-bar"></div>
 
@@ -956,25 +981,29 @@
     <span id="closeLightbox">&times;</span>
     <img id="lightboxImage" alt="Ingrandimento">
 </div>
-
-      <header>
-        <div class="navbar">
-            <div class="logo">
-                <img src="LOGO.jpg" alt="Logo">
-            </div>
-            <nav>
-                <ul>
-                    <li><a href="#">Home</a></li>
-                    <li><a href="#azienda">Azienda</a></li>
-                    <li><a href="#servizi">Servizi</a></li>
-                    <li><a href="#galleria">Portfolio</a></li>
-                    <li><a href="#preventivo">Preventivo</a></li>
-                    <li><a href="area.riservata.html">Area Riservata</a>
-
-                </ul>
-            </nav>
+<header>
+    <div class="navbar container">
+        <div class="logo">
+            <img src="LOGO.jpg" alt="Logo">
         </div>
-    </header>
+        
+        <!-- Pulsante che apparirà solo su mobile -->
+        <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        
+        <nav id="nav-menu">
+            <ul>
+                <li><a href="#">Home</a></li>
+                <li><a href="#azienda">Azienda</a></li>
+                <li><a href="#servizi">Servizi</a></li>
+                <li><a href="#galleria">Portfolio</a></li>
+                <li><a href="#preventivo">Preventivo</a></li>
+                <!-- Voce Area Riservata evidenziata -->
+                <li><a href="area-riservata.html" style="color: #ff6b35; font-weight: bold;">🔒 Area Riservata</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
 
 <section class="hero" style="text-align: center;">
     <div class="container" style="max-width: 900px; margin: auto;">
@@ -1574,6 +1603,11 @@ function menuPrivato() {
     }, { threshold: 0.5 });
     const section = document.querySelector('.counters');
     if (section) observer.observe(section);
+    function toggleMenu() {
+    const nav = document.getElementById('nav-menu');
+    nav.classList.toggle('active');
+}
+
 </script>
 </body>
 </html>
