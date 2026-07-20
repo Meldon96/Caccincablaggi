@@ -18,17 +18,17 @@
         <button onclick="checkLogin()">Accedi</button>
         <p id="error" style="color:red; font-size: 12px;"></p>
     </div>
-
     <script>
         function checkLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
 
-            // Qui inseriremo i dati dei clienti
+            // Dati dei clienti corretti
             const utenti = {
-                "rossi":{
-                    pass:"Rossi1!",
-                    url:"https://drive.google.com/drive/folders/1GHakgB2CaQ7sZSHJsNrSKBCE-N_fjUtf},
+                "rossi": {
+                    pass: "Rossi1!",
+                    url: "https://drive.google.com/drive/folders/1GHakgB2CaQ7sZSHJsNrSKBCE-N_fjUtf" 
+                }
             };
 
             if (utenti[user] && utenti[user].pass === pass) {
@@ -38,5 +38,6 @@
             }
         }
     </script>
+
 </body>
 </html>
